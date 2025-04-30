@@ -41,7 +41,7 @@ public:
     }
     void OnConnected(bool result) override {
         char msg[32] = { 0 };
-        sprintf_s(msg, "Connected %s", result ? "" : "");
+        sprintf_s(msg, "Connected %s", result ? "true" : "false");
         ::SendMessageA(wnd_listbox, LB_ADDSTRING, 0, (LPARAM)msg);
     }
     void OnSend(int size) override {
@@ -51,7 +51,7 @@ public:
     }
     void OnRecv(void* data, int size) override {
         char msg[256] = { 0 };
-        strcat_s(msg, "Recv msg: ");
+		sprintf_s(msg, "Recv msg (%d): ",size);
         strncat_s(msg, 256, (const char*)data, size);
         ::SendMessageA(wnd_listbox, LB_ADDSTRING, 0, (LPARAM)msg);
     }
@@ -85,13 +85,13 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 		return FALSE;
 	}
     PipeCallback pipe_clllback;
-    PipeImplType name;
+    PipeImplType impleType;
 #ifdef ENABLE_ASYNCPIPE
-    name = PIPE_ASYNC;
+	impleType = PIPE_IMPLEMENT_ASYNC;
 #else
-    name = PIPE_OVERLAPPED;
+	impleType = PIPE_IMPLEMENT_OVERLAPPED;
 #endif
-    CreateInstance(name, &pipe_client_);
+    CreateInstance(impleType, &pipe_client_);
     pipe_client_->Create(kPipeName, PIPE_CLIENT, &pipe_clllback);
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_ASYNCIPCCLIENT));
 

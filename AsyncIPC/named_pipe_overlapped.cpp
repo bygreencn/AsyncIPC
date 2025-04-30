@@ -97,7 +97,7 @@ void NamedPipeOverlapped::DoWork()
         }
     }
 }
-
+//Write
 bool NamedPipeOverlapped::OnWriteComplete()
 {
     send_flag_--;
@@ -107,7 +107,7 @@ bool NamedPipeOverlapped::OnWriteComplete()
     }
     return true;
 }
-
+//Read
 bool NamedPipeOverlapped::OnReadComplete()
 {
     recv_flag_--;

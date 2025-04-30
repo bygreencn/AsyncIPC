@@ -38,7 +38,8 @@ class PipeCallback
     : public IPipeDelegate {
 public:
     void OnCreate(bool) override {
-        wchar_t buffer[MAX_PATH] = { 0 };
+        /*
+		wchar_t buffer[MAX_PATH] = {0};
         ::GetModuleFileName(NULL, buffer, MAX_PATH);
         int length = wcslen(buffer);
         for (int i = 0; i < length; ++i) {
@@ -56,10 +57,11 @@ public:
         }
         ::CloseHandle(pi.hThread);
         ::CloseHandle(pi.hProcess);
+		*/
     }
     void OnConnected(bool result) override {
         char msg[32] = { 0 };
-        sprintf_s(msg, "Connected %s", result ? "" : "");
+        sprintf_s(msg, "Connected %s", result ? "true" : "false");
         ::SendMessageA(wnd_listbox, LB_ADDSTRING, 0, (LPARAM)msg);
     }
     void OnSend(int size) override {
@@ -69,7 +71,7 @@ public:
     }
     void OnRecv(void* data, int size) override {
         char msg[256] = { 0 };
-        strcat_s(msg, "Recv msg: ");
+        sprintf_s(msg, "Recv msg (%d): ",size);
         strncat_s(msg, 256, (const char*)data, size);
         ::SendMessageA(wnd_listbox, LB_ADDSTRING, 0, (LPARAM)msg);
     }
@@ -103,13 +105,13 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 		return FALSE;
 	}
     PipeCallback pipe_clllback;
-    PipeImplType name;
+    PipeImplType impleType;
 #ifdef ENABLE_ASYNCPIPE
-    name = PIPE_ASYNC;
+	impleType = PIPE_IMPLEMENT_ASYNC;
 #else
-    name = PIPE_OVERLAPPED;
+	impleType = PIPE_IMPLEMENT_OVERLAPPED;
 #endif
-    CreateInstance(name, &pipe_server_);
+    CreateInstance(impleType, &pipe_server_);
     pipe_server_->Create(kPipeName, PIPE_SERVER, &pipe_clllback);
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_ASYNCIPCSERVER));
 
@@ -193,7 +195,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    }
    wnd_edit = ::CreateWindowEx(0, L"edit", NULL, WS_VISIBLE | WS_CHILD | WS_BORDER, 30, 20, 300, 24, hWnd, (HMENU)IDC_EDIT_SEND, hInstance, NULL);
    wnd_btn = ::CreateWindowEx(0, L"button", L"·¢ËÍ", WS_VISIBLE | WS_CHILD | WS_BORDER, 336, 20, 42, 24, hWnd, (HMENU)IDC_BUTTON_SEND, hInstance, NULL);
-   wnd_listbox = ::CreateWindowEx(0, L"listbox", NULL, WS_VISIBLE | WS_CHILD | WS_BORDER | LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP, 
+   wnd_listbox = ::CreateWindowEx(0, L"listbox", NULL, WS_VISIBLE | WS_CHILD | WS_BORDER | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP, 
        0, 60, width, height - 60, hWnd, (HMENU)IDC_LISTBOX1, hInstance, NULL);
 
    ShowWindow(hWnd, nCmdShow);

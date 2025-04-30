@@ -30,6 +30,8 @@ protected:
     virtual void DoWork() = 0;
 
 protected:
+    PipeType pipeType;
+    wchar_t pipeName[512];
     bool need_exit_;
     HANDLE pipe_handle_;
     IPipeDelegate* delegate_;

@@ -7,13 +7,18 @@
 #endif
 
 enum PipeType {
-    PIPE_SERVER = 0,
+    PIPE_NONE = 0,
+    PIPE_SERVER,
     PIPE_CLIENT,
+    PIPE_MAX,
 };
 
 enum PipeImplType {
-    PIPE_ASYNC = 0,
-    PIPE_OVERLAPPED,
+    PIPE_IMPLEMENT_NONE = 0,
+    PIPE_IMPLEMENT_ASYNC,
+    PIPE_IMPLEMENT_OVERLAPPED,
+    PIPE_IMPLEMENT_MAX
+    
 };
 
 class IPipeDelegate {
@@ -34,6 +39,6 @@ public:
 };
 
 // 创建IPC实例
-ASYNCIPC_API int CreateInstance(PipeImplType name, INamedPipe** pipe);
+ASYNCIPC_API int CreateInstance(PipeImplType type, INamedPipe** pipe);
 // 初始化日志库
 ASYNCIPC_API void InitEasyLog(const char* process_name);

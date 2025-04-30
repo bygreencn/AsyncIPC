@@ -7,6 +7,8 @@ NamedPipeImpl::NamedPipeImpl()
     , pipe_handle_(INVALID_HANDLE_VALUE)
     , delegate_(nullptr)
     , wait_event_(NULL)
+    , pipeType(PIPE_NONE)
+    , pipeName(L"")
 {
 }
 
@@ -21,6 +23,10 @@ bool NamedPipeImpl::Create(const wchar_t* pipe_name, PipeType type, IPipeDelegat
         LOG(ERROR) << "Create pipe failed, pipe_name is null";
         return false;
     }
+    wcscpy_s(this->pipeName, pipeName);
+
+    this->pipeType = type;
+    
     BOOL result = FALSE;
     delegate_ = delegate;
     switch (type)
@@ -88,18 +94,6 @@ bool NamedPipeImpl::CreatePipeServer(const wchar_t* pipe_name)
         LOG(ERROR) << "CreateNamedPipe error, code: " << GetLastError();
         return FALSE;
     }
-    OVERLAPPED ol = { 0 };
-    ol.hEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-    ::ConnectNamedPipe(pipe_handle_, &ol);
-    // 等待10秒，超时后返回失败，避免无限等待连接造成程序卡死。
-    bool connected = ::WaitForSingleObject(ol.hEvent, 10 * 1000) != WAIT_TIMEOUT;
-    ::CloseHandle(ol.hEvent);
-    if (!connected) {
-        LOG(ERROR) << L"ConnectNamedPipe error, code: %u" << GetLastError();
-    }
-    if (delegate_) {
-        delegate_->OnConnected(connected);
-    }
     return true;
 }
 
@@ -152,5 +146,36 @@ void NamedPipeImpl::ClosePipe()
 void NamedPipeImpl::ThreadProc(void* param)
 {
     NamedPipeImpl* pipe = (NamedPipeImpl*)param;
+    if (pipe->pipeType == PIPE_SERVER)
+    {
+        DWORD wait_result = 0;
+        OVERLAPPED ol = { 0 };
+        ol.hEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+
+        HANDLE handles[2] = { pipe->wait_event_, ol.hEvent };
+        ::ConnectNamedPipe(pipe->pipe_handle_, &ol);
+        // 等待Client的连接。
+        wait_result = ::WaitForMultipleObjects(2, handles, FALSE, INFINITE);
+        ::CloseHandle(ol.hEvent);
+        if (pipe->need_exit_) {
+            return;
+        }
+        switch (wait_result)
+        {
+        case WAIT_OBJECT_0: {
+            return;
+        }
+        case WAIT_OBJECT_0 + 1: {
+            if (pipe->delegate_) {
+                pipe->delegate_->OnConnected(TRUE);
+            }
+            break;
+        }
+        default: {
+            LOG(ERROR) << L"ConnectNamedPipe error, code: %u" << GetLastError();
+            return;
+        }
+        }
+    }
     pipe->DoWork();
 }

@@ -1,7 +1,17 @@
 #pragma once
 #include "async_ipc.h"
+#include "named_pipe_define.h"
+
+#include <thread>
+#include <mutex>
+#include <string>
+#include <list>
+#include <memory>
+#include <string>
+#include <windows.h>
 #include "named_pipe_impl.h"
 
+class IPipeDelegate;
 class NamedPipeOverlapped
     : public NamedPipeImpl
 {

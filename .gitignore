@@ -1,3 +1,36 @@
+#忽略Windows创建的缩略图文件
+Thumbs.db
+#忽略由 Visual Studio 构建的文件
+*.obj
+*.exe
+*.pdb
+*.user
+*.aps
+*.pch
+*.vspscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
+*.bak
+*.cache
+*.ilk
+*.log
+[Bb]in
+[Dd]ebug*/
+*.lib
+*.sbr
+obj/
+[Rr]elease*/
+_ReSharper*/
+[Tt]est[Rr]esult*
+.vs/
+.idea/
+#Nuget包文件夹
+packages/
+
 # Prerequisites
 *.d
 
@@ -30,3 +63,4 @@
 *.exe
 *.out
 *.app
+

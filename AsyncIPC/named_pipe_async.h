@@ -23,7 +23,8 @@ protected:
 
     bool PipeWrite(void* data, uint32_t size) override;
     bool PipeRead() override;
-
+    void DoWork() override;
+	
     static void WINAPI OnWriteCompletionRoutine(
         DWORD dwErrorCode,
         DWORD dwNumberOfBytesTransfered,
@@ -36,7 +37,7 @@ protected:
         LPOVERLAPPED lpOverlapped
         );
 
-    void DoWork();
+
 
 private:
     std::string recv_buffer_;

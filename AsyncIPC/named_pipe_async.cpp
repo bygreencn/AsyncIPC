@@ -14,6 +14,10 @@ bool NamedPipeAsync::PipeWrite(void* data, uint32_t size)
 {
     int ol_size = sizeof(PipeOverlapped);
     PipeOverlapped* ol_data = (PipeOverlapped*)malloc(ol_size);
+    if (NULL == ol_data)    {
+        LOG(ERROR) << "PipeWrite malloc error.";
+        return false;
+    }
     ZeroMemory(ol_data, ol_size);
     ol_data->param = this;
     BOOL result = ::WriteFileEx(pipe_handle_, data, size, (LPOVERLAPPED)ol_data, OnWriteCompletionRoutine);
@@ -28,6 +32,10 @@ bool NamedPipeAsync::PipeRead()
 {
     int ol_size = sizeof(PipeOverlapped);
     PipeOverlapped* ol_data = (PipeOverlapped*)malloc(ol_size);
+    if (NULL == ol_data) {
+        LOG(ERROR) << "PipeRead malloc error.";
+        return false;
+    }
     ZeroMemory(ol_data, ol_size);
     ol_data->param = this;
     BOOL result = ::ReadFileEx(pipe_handle_, ol_data->buffer, kPipeBufferSize, (LPOVERLAPPED)ol_data, OnReadCompletionRoutine);
@@ -38,6 +46,7 @@ bool NamedPipeAsync::PipeRead()
     return true;
 }
 
+//Write
 void WINAPI NamedPipeAsync::OnWriteCompletionRoutine(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped)
 {
     PipeOverlapped* ol_data = (PipeOverlapped*)lpOverlapped;
@@ -52,7 +61,7 @@ void WINAPI NamedPipeAsync::OnWriteCompletionRoutine(DWORD dwErrorCode, DWORD dw
     }
     free(ol_data);
 }
-
+//Read
 void WINAPI NamedPipeAsync::OnReadCompletionRoutine(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped)
 {
     PipeOverlapped* ol_data = (PipeOverlapped*)lpOverlapped;

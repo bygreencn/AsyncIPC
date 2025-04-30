@@ -18,4 +18,4 @@ struct PipeOverlapped {
     DWORD trans_bytes;
 };
 
-static const int kOverlappedSize = sizeof(PIPE_OVERLAPPED);
+static const int kOverlappedSize = sizeof(PIPE_IMPLEMENT_OVERLAPPED);

@@ -23,15 +23,15 @@ BOOL GetExePathA(char* path, uint32_t size)
     return TRUE;
 }
 
-int CreateInstance(PipeImplType name, INamedPipe** pipe)
+int CreateInstance(PipeImplType impeType, INamedPipe** pipe)
 {
     INamedPipe* pipe_impl = nullptr;
-    switch (name)
+    switch (impeType)
     {
-    case PIPE_ASYNC:
+    case PIPE_IMPLEMENT_ASYNC:
         pipe_impl = new NamedPipeAsync;
         break;
-    case PIPE_OVERLAPPED:
+    case PIPE_IMPLEMENT_OVERLAPPED:
         pipe_impl = new NamedPipeOverlapped;
         break;
     default:
